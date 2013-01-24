@@ -13,13 +13,16 @@ class EmailSignup extends WP_Widget  {
 
 
 	public function EmailSignup() {
-		
+	
 		wp_register_script('jquery-validate', 
-			plugins_url('js/jquery-validate.js', __FILE__), 'jquery', '1.0', true );
+			plugins_url( '/js/jquery-validate.js' ), 'jquery', '1.0', true );
 
 		wp_register_script('email-subscription', 
 			plugins_url('js/email-sbuscription.js', __FILE__), 'jquery-validate', '1.0', true );
 
+		wp_register_script('jquery-set-field-titles', 
+			plugins_url( basename(__DIR__) . '/js/jquery.setFieldTitles.js' ), 
+			    'jquery', '1.0', false );
 
 		add_action( 'wp_ajax_nopriv_email_signup', 
 			array($this, 'submit_email') );
@@ -33,10 +36,12 @@ class EmailSignup extends WP_Widget  {
 		add_action( 'admin_menu', 
 			array($this, 'add_settings') );
 
-		$this->connectors = $this->get_connectors();
+		$this->connectors = $this->load_services();
 
 		if (!is_admin())
 			add_action( 'wp_enqueue_scripts', array($this, 'print_scripts') );
+			
+		add_action( 'admin_print_scripts', array($this, 'print_admin_scripts') );
 
 	}
 
@@ -57,22 +62,20 @@ class EmailSignup extends WP_Widget  {
 	 * Prints the necessary JS
 	 */
 	public function print_scripts() {
-
 		echo "<script type='text/javascript'>var ajaxURL='".admin_url('admin-ajax.php')."';</script>";
 		wp_enqueue_script( 'jquery-validate' );
 		wp_enqueue_script('email-subscription');
-		
 	}
+	
+	/*
+	 * Prints the necessary JS
+	 */
+	public function print_admin_scripts() {
+		wp_enqueue_script('jquery-set-field-titles');
+	}	
 
 	public function submit_email() {
-		
-		
-
-
 		die();
-
-
-	
 	}
 	
 	public function add_settings() {
@@ -81,32 +84,27 @@ class EmailSignup extends WP_Widget  {
 	}
 
 	public function options_html() {
-	    var_dump($_POST['selected_submit_handler']);
 	    if ( array_key_exists( 'selected_submit_handler', $_POST) )
 	        update_option( 'selected_submit_handler', $_POST['selected_submit_handler']);
 	        //echo get_option('selected_submit_handler');
-		require_once('lib/form.class.php');
+		require_once('lib/php-form-helper/form.class.php');
 		require_once('templates/admin/admin.tpl.php');
 	}
 	
-	public function get_connectors() {
-	    $connectors_dir = dirname(__FILE__).'/connectors/';
-	    $files = scandir($connectors_dir);
-	    $connectors = array();
+	public function load_services() {
+	    $services_dir = dirname(__FILE__).'/lib/services/';
+	    $files = scandir( $services_dir );
+	    $this->services = array();
 	    foreach( $files as $file ) {
-	        if ( $file == '.' ) continue;
-	        if ($file == '..' ) continue;
-	        $name = str_replace('connector.', '', $file);
-	        $name = str_replace('.php', '', $name);
+	        if ( $file == '.' || $file == '..' ) continue;
+	        $name = str_replace('.php', '', $file);
 	        if ($name == 'base') continue;
-	        require_once($connectors_dir . $file);
-            $connectors[] = ucfirst($name);
+	        require_once($services_dir . $file);
+	        $classname = ucfirst($name);
+	        echo $classname;
+            $this->services[$name] = new $classname();
         }
-        
-        return $connectors;
-
 	}
-
 }
 
 $email_signup = new EmailSignup()

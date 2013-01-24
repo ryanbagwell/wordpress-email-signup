@@ -22,18 +22,17 @@
                 </th>
             </tr>            
             
-            <?php foreach( $this->connectors as $connector ):
-                $c = new $connector();
+            <?php foreach( $this->services as $name => $service ):
             ?>
 	        <tr>
                 <th scope="row">
                     <label>
-                        <input type="radio" name="selected_submit_handler" value="<?php echo $c->name; ?>" <?php if ($c->name == get_option('selected_submit_handler')): ?>checked="checked"<?php endif; ?>/> 
-                        <?php echo $c->name; ?>
+                        <input type="radio" name="selected_submit_handler" value="<?php echo $service->name; ?>" <?php if ($service->name == get_option('selected_submit_handler')): ?>checked="checked"<?php endif; ?>/> 
+                        <?php echo $service->name; ?>
                     </label>
                 </th>
                 <td>
-                    <?php echo implode('<br />', $c->get_form_fields()); ?>
+                    <?php echo implode('<br />', $service->get_form_fields()); ?>
                 </td>
             </tr>
             <?php endforeach; ?>
@@ -43,6 +42,14 @@
 	<p class="submit">
 	    <input type="submit" name="submit" id="submit" class="button-primary" value="Save Changes" />
 	</p>
+	
+	<script type="text/javascript">
+	    jQuery(document).ready(function($) {
+	        $('input').setFieldTitles();
+	        
+	    });
+	
+	</script>
 	
 	</form>
 
