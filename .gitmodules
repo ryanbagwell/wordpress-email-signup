@@ -1,0 +1,3 @@
+[submodule "lib/php-form-helper"]
+	path = lib/php-form-helper
+	url = git@github.com:ryanbagwell/PHP-Form-Helpers.git
