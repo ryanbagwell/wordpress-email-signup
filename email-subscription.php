@@ -101,7 +101,7 @@ class EmailSignup extends WP_Widget  {
 	        
 	    if ( array_key_exists( 'email_signup_default_widget_title', $_POST) )
 	        update_option( 'email_signup_default_widget_title', $_POST['email_signup_default_widget_title']);	        
-		require_once('lib/php-form-helper/form.class.php');
+		require_once('lib/php-form-helpers/form.class.php');
 		require_once('templates/admin/admin.tpl.php');
 	}
 	

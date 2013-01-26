@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__).'/../php-form-helper/form.class.php');
+require_once(dirname(__FILE__).'/../php-form-helpers/form.class.php');
 
 class BaseConnector {
 	public $name = "Base Connector";
