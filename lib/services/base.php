@@ -7,12 +7,12 @@ class BaseConnector {
 
 
 	public function BaseConnector() {
-        $this->save_settings();
-
+	    if ( is_admin() )
+            $this->save_settings();
 	}
 
 
-	public function send() {
+	public function signup() {
 
 
 	}
@@ -21,27 +21,72 @@ class BaseConnector {
 	    
 	    return array(
 	        new TextField($this->slugify_name('user_name'), 
-	            'User Name', array( 'value' => get_option( $this->slugify_name('user_name') ))),
+	            'User Name', array( 
+	                'value' => get_option( $this->slugify_name('user_name') ),
+	                'id' => $this->slugify_name('user-name') )),
 	            
 	        new PasswordField($this->slugify_name('password'), 
-	            'Password', array( 'value' => get_option( $this->slugify_name('password') )))
+	            'Password', array(
+	                'value' => get_option( $this->slugify_name('password') ),
+	                'id' => $this->slugify_name('password') ))
+	            
 	    );
 	}
 	
 	public function slugify_name( $field_name ) {
-	    return strtolower( $this->slug."_$field_name" );
+	    return strtolower( $this->get_slug()."_$field_name" );
 	}
 	
 	public function save_settings() {
-	    foreach( $this->get_form_fields() as $field ) {
-	        var_dump($field->attrs);
-	        var_dump(array_key_exists( $field->attrs['name'], $_POST ));
-	        
+	    foreach( $this->get_form_fields() as $field ) {	      
 	        if ( array_key_exists( $field->attrs['name'], $_POST ) ) {
 	            update_option( $field->attrs['name'], $_POST[$field->attrs['name']] );
 	        }
 	    }
 	}
+	
+	public function get_slug() {
+	    $reflector = new ReflectionClass(get_class($this));
+	    $filename = basename($reflector->getFileName());
+	    return str_replace('.php', '', $filename);
+	}
+
+
+	
+	/*
+	 * 
+	 *
+	 */
+	public function error($message = '') {
+	    
+	    $error = array(
+	       'result' => 'error',
+	       'message' => $message
+	    );
+	    
+	    $this->response( json_encode( $error ));
+	    
+	}
+	
+	public function success() {
+
+        $success = array(
+	       'result' => 'success'  
+	    );
+	    
+	    $this->response( json_encode( $success ));
+	}
+	
+	/*
+	 *
+	 *
+	 */
+	public function response($response) {
+	    header('Content-type: application/json');
+	    
+	    die($response);
+	}
+
 
 }
 

@@ -2,10 +2,33 @@
 	<div id="icon-options-general" class="icon32"><br /></div>
 	<h2>Email Subscription Options</h2>
 	
-	<form method="post">
+	<style>
+	    #email-signup-admin td label {
+	        position:absolute; 
+	        top:2px; 
+	        left:6px;
+	    }
+	    
+	    #email-signup-admin td p {
+	        position: relative;
+	    }
+	
+	</style>
+	
+	<form id="email-signup-admin" method="post">
 	<table class="form-table">
 	    <tbody>
+
 	        <tr>
+                <th scope="row">
+                    <label>Widget Title</label>
+                </th>
+                <td>
+                    <input type="text" name="email_signup_default_widget_title" value="<?php echo get_option('email_signup_default_widget_title', ''); ?>" />
+                </td>
+            </tr>	        
+	        
+            <!-- <tr>
                 <th scope="row">
                     <label>Default Form Template</label>
                 </th>
@@ -14,11 +37,11 @@
                         <option></option>
                     </select>
                 </td>
-            </tr>
+            </tr> -->
             
 	        <tr colspan="2">
                 <th scope="row" colspan="2">
-                    Choose a a submission handler:
+                    Choose a service:
                 </th>
             </tr>            
             
@@ -32,7 +55,13 @@
                     </label>
                 </th>
                 <td>
-                    <?php echo implode('<br />', $service->get_form_fields()); ?>
+                    <?php foreach ( $service->get_form_fields() as $field ): ?>
+                        <p>
+                            <label for="<?php echo $field->attrs['id']; ?>"><?php echo $field->attrs['title']; ?></label>
+                            <?php echo $field; ?>
+                        </p>
+                    <?php endforeach; ?> 
+                   
                 </td>
             </tr>
             <?php endforeach; ?>
@@ -45,7 +74,10 @@
 	
 	<script type="text/javascript">
 	    jQuery(document).ready(function($) {
-	        $('input').setFieldTitles();
+	        $('label').inFieldLabels();
+	        
+	        
+	        
 	        
 	    });
 	
