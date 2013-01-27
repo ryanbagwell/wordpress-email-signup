@@ -39,9 +39,11 @@ class EmailSignup extends WP_Widget  {
 		add_action( 'admin_menu', 
 			array($this, 'add_settings') );
 			
-	    $this->load_services();
+    $this->load_services();
 		
 		$this->connectors = $this->services;
+		
+		$this->default_widget_template_path = 'templates/admin/admin.tpl.php';
         
        
         if (!is_admin())
@@ -114,9 +116,11 @@ class EmailSignup extends WP_Widget  {
 	        
 	    if ( array_key_exists( 'email_signup_default_widget_title', $_POST) )
 	        update_option( 'email_signup_default_widget_title', $_POST['email_signup_default_widget_title']);
-	        
+
 		require_once('lib/php-form-helpers/form.class.php');
-		require_once('templates/admin/admin.tpl.php');
+
+		require_once(  $this->get_widget_template() );
+
 	}
 	
 	/*
@@ -147,6 +151,28 @@ class EmailSignup extends WP_Widget  {
 	    return $this->services[$selected_service];
 	    
 	}
+	
+	/*
+	 * Finds a file named email-signup.widget.html.php
+	 * if it exists in the theme. If not, uses the default
+	 * widget template file
+	 */
+	public function get_widget_template() {
+	 
+	  $theme_iterator = new RecursiveDirectoryIterator(TEMPLATEPATH.'/');
+	  $file_iterator = new RecursiveIteratorIterator($theme_iterator);
+    $matches = new RegexIterator($file_iterator, 
+      '/email-signup\.widget\.html\.php/', 
+        RecursiveRegexIterator::GET_MATCH);
+    $matches = iterator_to_array($matches);
+
+    if ( count( $matches ) > 0 )
+      return key($matches);
+    
+    return $this->default_widget_template_path;
+    
+  }
+	
 }
 
 $email_signup = new EmailSignup()
