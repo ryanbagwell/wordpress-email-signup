@@ -59,6 +59,8 @@ class BaseConnector {
 	 */
 	public function error($message = '') {
 	    
+	    error_log('Cheetahmail error: ' . $message);
+	    
 	    $error = array(
 	       'result' => 'error',
 	       'message' => $message
