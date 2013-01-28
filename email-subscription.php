@@ -43,11 +43,9 @@ class EmailSignup extends WP_Widget  {
 		
 		$this->connectors = $this->services;
 
-        
-       
-        if (!is_admin())
+    if (!is_admin())
          add_action( 'wp_enqueue_scripts', array($this, 'print_scripts') );
-			
+
 		add_action( 'admin_print_scripts', array($this, 'print_admin_scripts') );
 
 	}
