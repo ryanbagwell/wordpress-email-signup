@@ -92,7 +92,7 @@ class Cheetah extends BaseConnector {
           * cookies don't last for the full 8 hours. So we'll
           * refresh the cookie and try again
           */
-         if ( stripos($response, 'err:auth') !== false ) {
+         if ( stripos($result, 'err:auth') !== false ) {
              error_log('Cheetahmail: cookie prematurely expired.');
              $this->refresh_auth_cookie();
              $this->signup();
@@ -102,7 +102,6 @@ class Cheetah extends BaseConnector {
           * Otherwise, send the client an error message
           * and log it
           */
-          error_log("Cheetahmail: error: $result ");
           $this->error( explode( ':',  $result ) ); 
 
      }
