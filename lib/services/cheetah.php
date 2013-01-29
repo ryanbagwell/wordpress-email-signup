@@ -92,8 +92,8 @@ class Cheetah extends BaseConnector {
           * cookies don't last for the full 8 hours. So we'll
           * refresh the cookie and try again
           */
-         if ( stripos($response, 'err:auth') > 0 ) {
-             error_log('CheetahMail Cookie prematurely expired.');
+         if ( stripos($response, 'err:auth') !== false ) {
+             error_log('Cheetahmail: cookie prematurely expired.');
              $this->refresh_auth_cookie();
              $this->signup();
          }
@@ -102,9 +102,10 @@ class Cheetah extends BaseConnector {
           * Otherwise, send the client an error message
           * and log it
           */
+          error_log("Cheetahmail: error: $result ");
           $this->error( explode( ':',  $result ) ); 
 
-     }     
+     }
     
     /*
      * In adition to the default form fields in the base class,
@@ -147,7 +148,7 @@ class Cheetah extends BaseConnector {
      * then re-requested when it expires.
      */
     public function refresh_auth_cookie() {
-        error_log("Refreshing Cheetah auth cookie");
+        error_log("Cheetahmail: refreshing auth cookie");
         $endpoint = $this->auth_endpoint . "?name=$this->user_name&cleartext=$this->password";     
         $c = curl_init($endpoint);
         curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
@@ -156,11 +157,12 @@ class Cheetah extends BaseConnector {
         curl_close($c);
     }
 
-
     /*
      * This makes the API call to Cheetah
      */
     public function send($email, $first_name, $last_name) {
+        error_log("Cheetahmail: sending $first_name $last_name $email to API.");
+        
         $endpoint = $this->data_endpoint."?email=$email&FNAME=$first_name&LNAME=$last_name";
         
         /*
