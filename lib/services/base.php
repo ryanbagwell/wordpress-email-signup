@@ -87,6 +87,25 @@ class BaseConnector {
 	}
 
 
+	/*
+	 * Utility function to create a querystring from
+	 * an array of key => value pairs
+	 */
+	public function make_querystring($params = array()) {
+	    $qs = array_map( array($this, '_mkqs'), 
+	        $params, array_keys($params));
+	    return implode('&', $qs);
+	}
+	
+	
+	/*
+	 * The make_querstring callback
+	 */	
+	private function _mkqs($v, $k) {
+	    return "$k=$v";
+	}
+
+
 }
 
 
