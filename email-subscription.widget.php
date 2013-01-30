@@ -42,7 +42,7 @@ class EmailSignupWidget extends WP_Widget {
         $matches = iterator_to_array($matches);
 
         if ( count( $matches ) > 0 )
-        return key($matches);
+            return key($matches);
 
         return $this->default_widget_template;
     
