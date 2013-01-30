@@ -13,8 +13,7 @@ class BaseConnector {
 
 
 	public function signup() {
-
-
+	    $this->error( 'not implemented' );
 	}
 
 	public function get_form_fields() {
