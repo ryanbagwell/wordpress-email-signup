@@ -102,7 +102,7 @@ class BaseConnector {
 	 * The make_querstring callback
 	 */	
 	private function _mkqs($v, $k) {
-	    return "$k=$v";
+	    return "$k=".urlencode(trim($v));
 	}
 
 
