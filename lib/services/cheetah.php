@@ -120,6 +120,20 @@ class Cheetah extends BaseConnector {
         
         $default_fields[] = new TextField( $this->slugify_name('subscriber_list_id'), 
             'Subscriber List ID', $attrs );
+
+        $attrs = array(
+            'value' => get_option( $this->slugify_name('affiliate_id') )
+        );
+
+        $default_fields[] = new TextField( $this->slugify_name('affiliate_id'), 
+            'Affiliate ID', $attrs );
+        
+        $attrs = array(
+            'value' => get_option( $this->slugify_name('source_id') )
+        );
+        
+        $default_fields[] = new TextField( $this->slugify_name('source_id'), 
+            'Source ID', $attrs );
                 
         return $default_fields;
     }
@@ -171,6 +185,12 @@ class Cheetah extends BaseConnector {
          */
         if ( !empty( $this->subscriber_list_id) )
             $endpoint .= "&sub=$this->subscriber_list_id";
+            
+        if ( !empty( $this->affiliate_id) )
+            $endpoint .= "&aid=$this->affiliate_id";
+            
+        if ( !empty( $this->source_id) )
+            $endpoint .= "&SOURCE=$this->source_id";
         
         $c = curl_init($endpoint);
         curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
