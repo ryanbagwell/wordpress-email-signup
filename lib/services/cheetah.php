@@ -204,7 +204,7 @@ class Cheetah extends BaseConnector {
             $query_params['aid'] = $this->affiliate_id;
             
         if ( !empty( $this->source_id) )
-            $query_params['source_id'] = $this->source_id;
+            $query_params['SOURCE'] = $this->source_id;
         
         $qs = $this->make_querystring($query_params);
         
