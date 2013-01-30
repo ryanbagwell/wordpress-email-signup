@@ -31,3 +31,9 @@
 
 <img class="loading" src="/wp-content/plugins/wordpress-email-signup/img/loading.gif" />
 
+<script type="text/javascript">
+    jQuery(document).ready(function($) {
+        var emailSignup = new EmailSignup('#mail-signup');
+    });
+</script>
+
