@@ -153,6 +153,7 @@ class Cheetah extends BaseConnector {
         curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($c, CURLOPT_COOKIEJAR, $this->cookie_file);
         $response = curl_exec($c);
+	error_log("Cheetah login1 response: ".trim($response));
         curl_close($c);
     }
 
@@ -175,7 +176,7 @@ class Cheetah extends BaseConnector {
         curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($c, CURLOPT_COOKIEFILE, $this->cookie_file);
         $response = curl_exec($c);
-        error_log($response);
+        error_log("Cheetah response: ".trim($response));
         curl_close($c);
         
         
