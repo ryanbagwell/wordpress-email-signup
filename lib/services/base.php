@@ -8,7 +8,7 @@ class BaseConnector {
     public function BaseConnector() {
         if ( is_admin() )
             $this->save_settings();
-            
+
         $this->settings = $this->get_settings();
         
     }
@@ -19,7 +19,7 @@ class BaseConnector {
    * be overidden in individual services classes
    */
     public function signup() {
-        return false;
+        $this->error( 'not implemented' );
     }
 
 

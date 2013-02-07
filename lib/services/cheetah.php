@@ -35,7 +35,11 @@ class Cheetah extends BaseConnector {
         
         //set the location of the temp file
         $this->cookie_file = sys_get_temp_dir() . "/" . $this->cookie_file;
-               
+        
+        /*
+         * To Do: make this dynamic so we don't alwyas have to add
+         * a field
+         */
         $this->user_name = get_option( 
             $this->slugify_name('user_name') );
         
@@ -44,6 +48,13 @@ class Cheetah extends BaseConnector {
             
         $this->subscriber_list_id = get_option( 
             $this->slugify_name('subscriber_list_id') );
+            
+        $this->affiliate_id = get_option( 
+            $this->slugify_name('affiliate_id') );
+                
+        $this->source_id = get_option( 
+            $this->slugify_name('source_id') );
+                    
     }
     
     /*
@@ -120,6 +131,20 @@ class Cheetah extends BaseConnector {
         
         $default_fields[] = new TextField( $this->slugify_name('subscriber_list_id'), 
             'Subscriber List ID', $attrs );
+
+        $attrs = array(
+            'value' => get_option( $this->slugify_name('affiliate_id') )
+        );
+
+        $default_fields[] = new TextField( $this->slugify_name('affiliate_id'), 
+            'Affiliate ID', $attrs );
+        
+        $attrs = array(
+            'value' => get_option( $this->slugify_name('source_id') )
+        );
+        
+        $default_fields[] = new TextField( $this->slugify_name('source_id'), 
+            'Source ID', $attrs );
                 
         return $default_fields;
     }
@@ -161,24 +186,38 @@ class Cheetah extends BaseConnector {
      * This makes the API call to Cheetah
      */
     public function send($email, $first_name, $last_name) {
-        error_log("Cheetahmail: sending $first_name $last_name $email to API.");
         
-        $endpoint = $this->data_endpoint."?email=$email&FNAME=$first_name&LNAME=$last_name";
+        $query_params = array(
+            'email' => $email,
+            'FNAME' => $first_name,
+            'LNAME' => $last_name
+        );
         
         /*
          * Add the list ID that the person should be signed up for
          * if we've specified it in the backend
          */
         if ( !empty( $this->subscriber_list_id) )
-            $endpoint .= "&sub=$this->subscriber_list_id";
+            $query_params['sub'] = $this->subscriber_list_id;
+            
+        if ( !empty( $this->affiliate_id) )
+            $query_params['aid'] = $this->affiliate_id;
+            
+        if ( !empty( $this->source_id) )
+            $query_params['SOURCE'] = $this->source_id;
         
+        $qs = $this->make_querystring($query_params);
+        
+        error_log("Cheetahmail: sending $qs to API.");
+        
+        $endpoint = $this->data_endpoint."?$qs";
+
         $c = curl_init($endpoint);
         curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($c, CURLOPT_COOKIEFILE, $this->cookie_file);
         $response = curl_exec($c);
         error_log("Cheetah response: ".trim($response));
         curl_close($c);
-        
         
         return trim($response);
     }
