@@ -4,15 +4,15 @@
 	
 	<style>
 	    #email-signup-admin td label {
-	        position:absolute; 
-	        top:2px; 
-	        left:6px;
+            display: inline-block;
+            text-align: right;
+            margin-right: 10px;
+            
 	    }
 	    
 	    #email-signup-admin td p {
 	        position: relative;
 	    }
-	
 	</style>
 	
 	<form id="email-signup-admin" method="post">
@@ -43,7 +43,7 @@
                 <th scope="row" colspan="2">
                     Choose a service:
                 </th>
-            </tr>            
+            </tr>
             
             <?php foreach( $this->services as $name => $service ):
             ?>
@@ -71,19 +71,23 @@
 	<p class="submit">
 	    <input type="submit" name="submit" id="submit" class="button-primary" value="Save Changes" />
 	</p>
+	</form>
 	
-	<script type="text/javascript">
+	<script>
 	    jQuery(document).ready(function($) {
-	        $('label').inFieldLabels();
-	        
-	        
-	        
+            var width = 0;
+	        $('td label').each(function() {
+                if ($(this).width() > width)
+                    width = $(this).width();
+	        }).promise().done(function() {    
+	            $('td label').css({
+	                width: width+'px'
+	            });
+	        });
 	        
 	    });
 	
 	</script>
-	
-	</form>
 
 </div>
 
