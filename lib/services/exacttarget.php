@@ -4,14 +4,14 @@ require_once('base.php');
 require_once(dirname(__FILE__).'/../exactarget/exacttarget_soap_client.php');
 
 class Exacttarget extends BaseConnector {
-	public $name = "Exacttarget";
-	public $slug = "exact_target";
+    public $name = "Exacttarget";
+    public $slug = "exact_target";
 
-	public function Exacttarget() {
-		parent:: __construct();
-	}
-	
-	public function signup() {
+    public function Exacttarget() {
+        parent:: __construct();
+    }
+    
+    public function signup() {
         
         extract( $_POST );
         
@@ -23,8 +23,8 @@ class Exacttarget extends BaseConnector {
             
         if ( empty( $last_name ))
             $this->error( 'You must provide your last name.');
-	    
-        try	{
+        
+        try {
             $client = $this->get_client();
             
             $subscriber = new ExactTarget_Subscriber();
@@ -39,11 +39,11 @@ class Exacttarget extends BaseConnector {
             $object = new SoapVar($subscriber, SOAP_ENC_OBJECT, 
                 'Subscriber', "http://exacttarget.com/wsdl/partnerAPI");
             $request = new ExactTarget_CreateRequest();
-    		$request->Options = NULL;
-    		$request->Objects = array($object);
-    		
-    		$results = $client->Create($request);
-    		error_log( $results );
+            $request->Options = NULL;
+            $request->Objects = array($object);
+            
+            $results = $client->Create($request);
+            error_log( $results );
 
             $this->success();
             
