@@ -78,7 +78,7 @@ EmailSignup.prototype.ajaxSuccess = function(response) {
  * Called after an unsuccessful ajax call
  */
 EmailSignup.prototype.ajaxError = function() {
-	this.submitError();
+	this.signupError();
 };
 /*
  * Handles a successufl signup
