@@ -47,12 +47,25 @@ EmailSignup.prototype.beforeSubmit = function() {
 	this.$el.find('.loading').css('display', 'block');
 };
 EmailSignup.prototype.ajaxSuccess = function(response) {
+
+	if (response.result == 'error' ) {
+		this.signupError();
+		return;
+	}
+	
+	this.signupSuccess();
+
+};
+EmailSignup.prototype.ajaxError = function() {
+	this.submitError();
+};
+EmailSignup.prototype.signupSuccess = function() {
 	this.$el.find('.loading').hide();
 	this.$el.fadeOut();
 	this.$el.parent().find('.success').show();
 	return;
 };
-EmailSignup.prototype.ajaxError = function(response) {
+EmailSignup.prototype.signupError = function() {
 	this.$el.fadeTo('fast', 1);
 	alert('Sorry, there was an error. Please try again.');
 };
