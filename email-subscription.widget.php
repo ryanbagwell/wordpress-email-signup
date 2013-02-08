@@ -20,9 +20,9 @@ class EmailSignupWidget extends WP_Widget {
         if ( is_active_widget( false, false, $this->id_base, true) === false )
             return;
     
-        wp_enqueue_script( 'jquery' );
-        wp_enqueue_script( 'jquery-validation' );
-        wp_enqueue_script( 'email-subscription' );
+        // wp_enqueue_script( 'jquery' );
+        // wp_enqueue_script( 'jquery-validation' );
+        // wp_enqueue_script( 'email-subscription' );
     
 	}
 
