@@ -45,7 +45,14 @@ class Exacttarget extends BaseConnector {
             $request->Objects = array($object);
             
             $results = $client->Create($request);
-
+            
+            /*
+             * This is the code for a duplicate email address
+             * Just call the success handler
+             */
+            if ( $results->Results->ErrorCode == 12014 )
+                $this->success();
+            
             if ( $results->Results->StatusCode == 'Error' )
                 $this->error( $results->Results->StatusMessage );
 
