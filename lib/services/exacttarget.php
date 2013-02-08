@@ -36,8 +36,7 @@ class Exacttarget extends BaseConnector {
                     $this->settings->extra_param_value)
             ));
             
-            if ( !empty($this->settings->subscriber) )
-                $subscriber->SubscriberKey = $this->settings->subscriber;
+            $subscriber->SubscriberKey = $email_address;
             
             $object = new SoapVar($subscriber, SOAP_ENC_OBJECT, 
                 'Subscriber', "http://exacttarget.com/wsdl/partnerAPI");
@@ -92,10 +91,6 @@ class Exacttarget extends BaseConnector {
      */
     public function get_form_fields() {
         $default_fields = parent::get_form_fields();
-
-        $default_fields[] = new TextField( $this->slugify_name('subscriber_key'), 
-            'Subscriber Key', array( 'value' => get_option( 
-                $this->slugify_name('subscriber_key') )) );
         
         $default_fields[] = new TextField( $this->slugify_name('wsdl_url'), 
             'WSDL Url', array( 'value' => get_option( 

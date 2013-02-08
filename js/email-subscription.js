@@ -8,6 +8,9 @@ var EmailSignup = function(el) {
 	});
 
 };
+/*
+ * The WordPress AJAX URL to post to
+ */
 EmailSignup.prototype.ajaxURL = function() {
 
 	if (typeof(ajaxURL) !== 'undefined')
@@ -16,15 +19,24 @@ EmailSignup.prototype.ajaxURL = function() {
 	return '/wp-admin/admin-ajax.php';
 
 };
+/*
+ * Error messages to be used for jquery validation
+ */
 EmailSignup.prototype.messages = {
 	first_name: "Enter first name",
 	last_name: "Enter last name",
 	email: "Invalid email"
 };
+/*
+ * The error handler for validation problems
+ */
 EmailSignup.prototype.errorHandler = function(error, el) {
 	error.insertAfter(el.prev());
 	error.prev().remove();
 };
+/*
+ * Handles submission operations
+ */
 EmailSignup.prototype.submitHandler = function(form) {
 
 	this.beforeSubmit();
@@ -41,11 +53,17 @@ EmailSignup.prototype.submitHandler = function(form) {
 	return false;
 
 };
+/*
+ * Is called before the submission
+ */
 EmailSignup.prototype.beforeSubmit = function() {
 	this.$el.find('input').fadeTo('fast', 0.5);
 	this.$el.find('button').css('visibility', 'hidden');
 	this.$el.find('.loading').css('display', 'block');
 };
+/*
+ * Is called after a successful ajax call
+ */
 EmailSignup.prototype.ajaxSuccess = function(response) {
 
 	if (response.result == 'error' ) {
@@ -56,15 +74,24 @@ EmailSignup.prototype.ajaxSuccess = function(response) {
 	this.signupSuccess();
 
 };
+/*
+ * Called after an unsuccessful ajax call
+ */
 EmailSignup.prototype.ajaxError = function() {
 	this.submitError();
 };
+/*
+ * Handles a successufl signup
+ */
 EmailSignup.prototype.signupSuccess = function() {
 	this.$el.find('.loading').hide();
 	this.$el.fadeOut();
 	this.$el.parent().find('.success').show();
 	return;
 };
+/*
+ * Handles an unsuccessful signup
+ */
 EmailSignup.prototype.signupError = function() {
 	this.$el.fadeTo('fast', 1);
 	alert('Sorry, there was an error. Please try again.');
