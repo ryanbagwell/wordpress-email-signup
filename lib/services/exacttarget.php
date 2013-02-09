@@ -9,12 +9,12 @@ class Exacttarget extends BaseConnector {
     public function Exacttarget() {
         
         // Check to see if soap is installed
-        if (SOAP_FUNCTIONS_ALL !== 999) {
-            error_log("Can't use ExactTarget. Soap is not installed.")
-            return;
-        }
-
-        require_once dirname(__FILE__).'/../exactarget/exacttarget_soap_client.php';
+        if ( !defined(SOAP_FUNCTIONS_ALL) ):
+            error_log('Please install SOAP');
+        else:
+            parent::BaseConnector();
+            require_once dirname(__FILE__).'/../exactarget/exacttarget_soap_client.php';
+        endif;
     
     }
     
