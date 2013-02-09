@@ -1,5 +1,5 @@
 <?php 
-require('soap-wsse.php');
+require_once dirname(__FILE__).'/soap-wsse.php';
 
 class ExactTargetSoapClient extends SoapClient {
     public $username = NULL;
