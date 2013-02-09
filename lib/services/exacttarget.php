@@ -1,14 +1,21 @@
 <?php
 
 require_once('base.php');
-require_once(dirname(__FILE__).'/../exactarget/exacttarget_soap_client.php');
 
 class Exacttarget extends BaseConnector {
     public $name = "Exacttarget";
     public $slug = "exact_target";
 
     public function Exacttarget() {
-        parent:: __construct();
+        
+        // Check to see if soap is installed
+        if (SOAP_FUNCTIONS_ALL !== 999) {
+            error_log("Can't use ExactTarget. Soap is not installed.")
+            return;
+        }
+
+        require_once dirname(__FILE__).'/../exactarget/exacttarget_soap_client.php';
+    
     }
     
     public function signup() {
