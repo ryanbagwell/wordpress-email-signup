@@ -33,9 +33,6 @@ class Exacttarget extends BaseConnector {
         
         try {
             $client = $this->get_client();
-            
-            var_dump($client);
-            
             $subscriber = new ExactTarget_Subscriber();
             $subscriber->EmailAddress = $email_address;
             $subscriber->SubscriberKey = $email_address;
