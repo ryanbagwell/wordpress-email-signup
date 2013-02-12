@@ -15,7 +15,7 @@ class Exacttarget extends BaseConnector {
             parent::BaseConnector();
             require_once dirname(__FILE__).'/../exactarget/exacttarget_soap_client.php';
         endif;
-    
+
     }
     
     public function signup() {
@@ -33,6 +33,9 @@ class Exacttarget extends BaseConnector {
         
         try {
             $client = $this->get_client();
+            
+            var_dump($client);
+            
             $subscriber = new ExactTarget_Subscriber();
             $subscriber->EmailAddress = $email_address;
             $subscriber->SubscriberKey = $email_address;
@@ -40,15 +43,15 @@ class Exacttarget extends BaseConnector {
                 $this->get_attribute('FirstName', $first_name),
                 $this->get_attribute('LastName', $last_name),
             );
-            
+
             if ( $this->settings->extra_param_value )
                 $subscriber->Attributes[] = $this->get_attribute(
                     $this->settings->extra_param_name,
                     $this->settings->extra_param_value);
-            
-            if ( $this->settings->list_id )
+
+            if ( !empty($this->settings->list_id) )
                 $subscriber->Lists = array($this->_get_list_obj($this->settings->list_id));
-                        
+            
             $object = new SoapVar($subscriber, SOAP_ENC_OBJECT, 
                 'Subscriber', "http://exacttarget.com/wsdl/partnerAPI");
             $request = new ExactTarget_CreateRequest();
@@ -89,8 +92,8 @@ class Exacttarget extends BaseConnector {
             $this->error('Please specify an API path.');
 
         $client = new ExactTargetSoapClient($wsdl, array('trace'=>1));
-        $client->username = $this->settings->user_name;
-        $client->password = $this->settings->password;
+        $client->username = $this->_escape_characters($this->settings->user_name);
+        $client->password = $this->_escape_characters($this->settings->password);
         return $client;
     }
     
@@ -136,6 +139,11 @@ class Exacttarget extends BaseConnector {
      */
     public function _get_list_obj($list_id = false) {
         if (!$list_id) return false;
+        try {
+            $list_id = (int) $list_id;
+        } catch (Exception $e) {
+            $list_id = 111111;
+        }
         $list_obj = new ExactTarget_SubscriberList(); 
         $list_obj->ID = $list_id;
         $list_obj->Status = ExactTarget_SubscriberStatus::Active;
@@ -143,5 +151,12 @@ class Exacttarget extends BaseConnector {
         return $list_obj;
     }
     
+    /*
+     * Converts special xml-incompitable characters
+     * so SOAP won't choke on it
+     */
+    public function _escape_characters($str = '') {
+        return str_replace('&', '&amp;', $str);
+    }
 
 }
