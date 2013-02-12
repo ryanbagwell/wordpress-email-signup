@@ -8,8 +8,8 @@ class Exacttarget extends BaseConnector {
 
     public function Exacttarget() {
         
-        // Check to see if soap is installed
-        if ( !defined(SOAP_FUNCTIONS_ALL) ):
+         // Check to see if soap is installed
+        if ( !defined('SOAP_FUNCTIONS_ALL') ):
             error_log('Please install SOAP');
         else:
             parent::BaseConnector();
@@ -33,18 +33,22 @@ class Exacttarget extends BaseConnector {
         
         try {
             $client = $this->get_client();
-            
             $subscriber = new ExactTarget_Subscriber();
             $subscriber->EmailAddress = $email_address;
-            $subscriber->Attributes = array_merge( $subscriber->Attributes, array(
+            $subscriber->SubscriberKey = $email_address;
+            $subscriber->Attributes = array(
                 $this->get_attribute('FirstName', $first_name),
                 $this->get_attribute('LastName', $last_name),
-                $this->get_attribute( $this->settings->extra_param_name,
-                    $this->settings->extra_param_value)
-            ));
+            );
             
-            $subscriber->SubscriberKey = $email_address;
+            if ( $this->settings->extra_param_value )
+                $subscriber->Attributes[] = $this->get_attribute(
+                    $this->settings->extra_param_name,
+                    $this->settings->extra_param_value);
             
+            if ( $this->settings->list_id )
+                $subscriber->Lists = array($this->_get_list_obj($this->settings->list_id));
+                        
             $object = new SoapVar($subscriber, SOAP_ENC_OBJECT, 
                 'Subscriber', "http://exacttarget.com/wsdl/partnerAPI");
             $request = new ExactTarget_CreateRequest();
@@ -57,8 +61,10 @@ class Exacttarget extends BaseConnector {
              * This is the code for a duplicate email address
              * Just call the success handler
              */
-            if ( $results->Results->ErrorCode == 12014 )
+            if ( $results->Results->ErrorCode == 12014 ) {
+                error_log("ExactTarget: OK, but duplicate email for $email_address");
                 $this->success();
+            }
             
             if ( $results->Results->StatusCode == 'Error' )
                 $this->error( $results->Results->StatusMessage );
@@ -109,6 +115,10 @@ class Exacttarget extends BaseConnector {
         $default_fields[] = new TextField( $this->slugify_name('wsdl_url'), 
             'WSDL Url', array( 'value' => get_option( 
                 $this->slugify_name('wsdl_url') )) );
+                
+        $default_fields[] = new TextField( $this->slugify_name('list_id'), 
+            'List ID', array( 'value' => get_option( 
+                $this->slugify_name('list_id') )) );
             
         $default_fields[] = new TextField( $this->slugify_name('extra_param_name'), 
             'Extra Param Name', array( 'value' => get_option( 
@@ -120,5 +130,18 @@ class Exacttarget extends BaseConnector {
                 
         return $default_fields;
     }
+
+    /**
+     * Creates a new list object to attach to a subscriber object
+     */
+    public function _get_list_obj($list_id = false) {
+        if (!$list_id) return false;
+        $list_obj = new ExactTarget_SubscriberList(); 
+        $list_obj->ID = $list_id;
+        $list_obj->Status = ExactTarget_SubscriberStatus::Active;
+        $list_obj->Action = "create";
+        return $list_obj;
+    }
+    
 
 }
