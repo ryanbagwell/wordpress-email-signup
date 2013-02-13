@@ -9,10 +9,18 @@
             margin-right: 10px;
             
 	    }
-	    
 	    #email-signup-admin td p {
 	        position: relative;
 	    }
+	    
+	    #email-signup-admin tr.service td {
+	        display: none;
+	    }
+	    #email-signup-admin tr.service.selected td {
+	        display: table-row;
+	    }
+	    
+	    
 	</style>
 	
 	<form id="email-signup-admin" method="post">
@@ -26,18 +34,7 @@
                 <td>
                     <input type="text" name="email_signup_default_widget_title" value="<?php echo get_option('email_signup_default_widget_title', ''); ?>" />
                 </td>
-            </tr>	        
-	        
-            <!-- <tr>
-                <th scope="row">
-                    <label>Default Form Template</label>
-                </th>
-                <td>
-                    <select name="default_form_template">
-                        <option></option>
-                    </select>
-                </td>
-            </tr> -->
+            </tr>
             
 	        <tr colspan="2">
                 <th scope="row" colspan="2">
@@ -47,14 +44,14 @@
             
             <?php foreach( $this->services as $name => $service ):
             ?>
-	        <tr>
+	        <tr class="service<?php if ($service->name == get_option('selected_submit_handler')): ?> selected<?php endif; ?>">
                 <th scope="row">
                     <label>
-                        <input type="radio" name="selected_submit_handler" value="<?php echo $service->name; ?>" <?php if ($service->name == get_option('selected_submit_handler')): ?>checked="checked"<?php endif; ?>/> 
+                        <input type="radio" name="selected_submit_handler" value="<?php echo $service->name; ?>" <?php if ($service->name == get_option('selected_submit_handler')): ?>checked="checked"<?php endif; ?> /> 
                         <?php echo $service->name; ?>
                     </label>
                 </th>
-                <td>
+                <td class="service-settings">
                     <?php foreach ( $service->get_form_fields() as $field ): ?>
                         <p>
                             <label for="<?php echo $field->attrs['id']; ?>"><?php echo $field->attrs['title']; ?></label>
@@ -75,18 +72,11 @@
 	
 	<script>
 	    jQuery(document).ready(function($) {
-            var width = 0;
-	        $('td label').each(function() {
-                if ($(this).width() > width)
-                    width = $(this).width();
-	        }).promise().done(function() {    
-	            $('td label').css({
-	                width: width+'px'
-	            });
-	        });
-	        
-	    });
-	
+    	    $('tr.service th input[type="radio"]').click(function() {
+    	        $(this).parents('tr').find('td').show();
+    	        $(this).parents('tr').siblings().find('td').hide();
+    	    });
+        });
 	</script>
 
 </div>
