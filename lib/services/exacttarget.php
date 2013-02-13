@@ -5,6 +5,7 @@ require_once('base.php');
 class Exacttarget extends BaseConnector {
     public $name = "Exacttarget";
     public $slug = "exact_target";
+    private $partner_api = "http://exacttarget.com/wsdl/partnerAPI";
 
     public function Exacttarget() {
         
@@ -33,6 +34,10 @@ class Exacttarget extends BaseConnector {
         
         try {
             $client = $this->get_client();
+            
+            /**
+              * Create our subscriber object
+              */
             $subscriber = new ExactTarget_Subscriber();
             $subscriber->EmailAddress = $email_address;
             $subscriber->SubscriberKey = $email_address;
@@ -48,11 +53,27 @@ class Exacttarget extends BaseConnector {
 
             if ( !empty($this->settings->list_id) )
                 $subscriber->Lists = array($this->_get_list_obj($this->settings->list_id));
-            
+
             $object = new SoapVar($subscriber, SOAP_ENC_OBJECT, 
-                'Subscriber', "http://exacttarget.com/wsdl/partnerAPI");
+                'Subscriber', $this->partner_api);
+            
+            /**
+             * This is a really complicated way of telling the API 
+             * add the user to the list if they already exist
+             */
+            $requestOptions = new ExactTarget_CreateOptions();
+    		$saveOption = new ExactTarget_SaveOption();
+    		$saveOption->PropertyName = "Subscriber";
+    		$saveOption->SaveAction = "UpdateAdd";
+    		$requestOptions->SaveOptions[] = new SoapVar($saveOption,
+    		    SOAP_ENC_OBJECT, 'SaveOption', $this->partner_api);
+            
+            /**
+             * Create our request object, and make the request
+             */
             $request = new ExactTarget_CreateRequest();
-            $request->Options = NULL;
+            $request->Options = new SoapVar($requestOptions,
+                SOAP_ENC_OBJECT, 'CreateOptions', $this->partner_api);
             $request->Objects = array($object);
             
             $results = $client->Create($request);
