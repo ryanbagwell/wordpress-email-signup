@@ -20,7 +20,7 @@
  * @license  http://www.php.net/license/3_01.txt  PHP License 3.01
  * @version  GIT 0.1
  * @link     https://github.com/ryanbagwell/wordpress-email-signup
- * 
+ *
  */
 
 require_once 'email-subscription.widget.php';
@@ -40,6 +40,8 @@ require_once 'email-subscription.widget.php';
 class EmailSignup extends WP_Widget
 {
 
+    public $service = false;
+
     /**
      * Our constructor
      *
@@ -48,50 +50,48 @@ class EmailSignup extends WP_Widget
      */
     public function EmailSignup()
     {
-    
+
         wp_register_script(
-            'jquery-validate', 
-            plugins_url(basename(dirname(__FILE__))  . '/js/jquery.validate.js'), 
+            'jquery-validate',
+            plugins_url(basename(dirname(__FILE__))  . '/js/jquery.validate.js'),
             'jquery', '1.0', true
         );
 
         wp_register_script(
-            'email-subscription', 
-            plugins_url(basename(dirname(__FILE__)) .'/js/email-subscription.js'), 
+            'email-subscription',
+            plugins_url(basename(dirname(__FILE__)) .'/js/email-subscription.js'),
             'jquery-validate', '1.0', true
         );
 
         wp_register_script(
-            'jquery-infield-label', 
+            'jquery-infield-label',
             plugins_url(
                 basename(dirname(__FILE__)) . '/js/jquery.infieldlabel.min.js'
-            ), 
+            ),
             'jquery', '1.0', false
         );
 
         add_action(
-            'wp_ajax_nopriv_email_signup', 
+            'wp_ajax_nopriv_email_signup',
             array($this, 'submit_email')
         );
 
         add_action(
-            'wp_ajax_email_signup', 
+            'wp_ajax_email_signup',
             array($this, 'submit_email')
         );
 
         add_action(
-            'widgets_init', 
+            'widgets_init',
             array($this, 'start_widget')
         );
 
         add_action(
-            'admin_menu', 
+            'admin_menu',
             array($this, 'add_settings')
         );
-            
-        $this->load_services();
-        
-        $this->connectors = $this->services;
+
+        $this->service = $this->get_selected_service();
 
         if (!is_admin())
             add_action(
@@ -137,13 +137,13 @@ class EmailSignup extends WP_Widget
     {
         echo "<script type='text/javascript'>
             var ajaxURL='".admin_url('admin-ajax.php')."';</script>";
-        
+
         //this can be uncommented later when we get the require.js stuff figured out
         // wp_enqueue_script( 'jquery' );
         // wp_enqueue_script( 'jquery-validate' );
         // wp_enqueue_script('email-subscription');
     }
-    
+
     /**
      * Prints the necessary JS
      *
@@ -152,9 +152,9 @@ class EmailSignup extends WP_Widget
     public function print_admin_scripts()
     {
         wp_enqueue_script('jquery-infield-label');
-    }   
+    }
 
-    
+
     /**
      * Calls the signup() method on the selected third-party service, which
      * sends the data to that service
@@ -166,7 +166,7 @@ class EmailSignup extends WP_Widget
         $service = $this->get_selected_service();
         $response = $service->signup();
     }
-    
+
     /**
      * The method that adds the admin menu item
      *
@@ -196,7 +196,7 @@ class EmailSignup extends WP_Widget
                 'selected_submit_handler',
                 $_POST['selected_submit_handler']
             );
-            
+
         if (array_key_exists('email_signup_default_widget_title', $_POST))
             update_option(
                 'email_signup_default_widget_title',
@@ -204,11 +204,11 @@ class EmailSignup extends WP_Widget
             );
 
         include_once 'lib/php-form-helpers/form.class.php';
-        
+
         include_once 'templates/admin/admin.tpl.php';
 
     }
-    
+
     /**
      * Makes the available third-party API services available,
      * and places them in a $this->services array
@@ -218,18 +218,19 @@ class EmailSignup extends WP_Widget
     public function load_services()
     {
         $services_dir = dirname(__FILE__).'/lib/services/';
-        $files = scandir($services_dir);
-        $this->services = array();
-        foreach($files as $file) {
-            if ($file == '.' || $file == '..') continue;
-            $name = str_replace('.php', '', $file);
-            if ($name == 'base') continue;
-            include_once $services_dir . $file;
-            $classname = ucfirst($name);
-            $this->services[$classname] = new $classname();
+
+        foreach(scandir($services_dir) as $file) {
+
+            try {
+
+                @include_once $services_dir . $file;
+
+            } catch(Exception $e) {}
+
         }
+
     }
-    
+
     /**
      * Returns the selected third-party service
      *
@@ -238,11 +239,16 @@ class EmailSignup extends WP_Widget
     public function get_selected_service()
     {
         $this->load_services();
+
         $selected_service = get_option('selected_submit_handler', false);
-        return $this->services[$selected_service];
-        
+
+        if ( $this->service === false )
+            $this->service = new $selected_service();
+
+        return $this->service;
+
     }
-    
+
 }
 
 $email_signup = new EmailSignup()
