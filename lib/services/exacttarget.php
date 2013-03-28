@@ -8,7 +8,7 @@ class Exacttarget extends BaseConnector {
     private $partner_api = "http://exacttarget.com/wsdl/partnerAPI";
 
     public function Exacttarget() {
-        
+
          // Check to see if soap is installed
         if ( !defined('SOAP_FUNCTIONS_ALL') ):
             error_log('Please install SOAP');
@@ -18,23 +18,23 @@ class Exacttarget extends BaseConnector {
         endif;
 
     }
-    
+
     public function signup() {
-        
+
         extract( $_POST );
-        
+
         if ( empty( $email_address ))
             $this->error( 'You must specify an email.');
-            
+
         if ( empty( $first_name ))
             $this->error( 'You must provide your first name.');
-            
+
         if ( empty( $last_name ))
             $this->error( 'You must provide your last name.');
-        
+
         try {
             $client = $this->get_client();
-            
+
             /**
               * Create our subscriber object
               */
@@ -54,11 +54,11 @@ class Exacttarget extends BaseConnector {
             if ( !empty($this->settings->list_id) )
                 $subscriber->Lists = array($this->_get_list_obj($this->settings->list_id));
 
-            $object = new SoapVar($subscriber, SOAP_ENC_OBJECT, 
+            $object = new SoapVar($subscriber, SOAP_ENC_OBJECT,
                 'Subscriber', $this->partner_api);
-            
+
             /**
-             * This is a really complicated way of telling the API 
+             * This is a really complicated way of telling the API
              * add the user to the list if they already exist
              */
             $requestOptions = new ExactTarget_CreateOptions();
@@ -67,7 +67,7 @@ class Exacttarget extends BaseConnector {
     		$saveOption->SaveAction = "UpdateAdd";
     		$requestOptions->SaveOptions[] = new SoapVar($saveOption,
     		    SOAP_ENC_OBJECT, 'SaveOption', $this->partner_api);
-            
+
             /**
              * Create our request object, and make the request
              */
@@ -75,9 +75,9 @@ class Exacttarget extends BaseConnector {
             $request->Options = new SoapVar($requestOptions,
                 SOAP_ENC_OBJECT, 'CreateOptions', $this->partner_api);
             $request->Objects = array($object);
-            
+
             $results = $client->Create($request);
-            
+
             /*
              * This is the code for a duplicate email address
              * Just call the success handler
@@ -86,7 +86,7 @@ class Exacttarget extends BaseConnector {
                 error_log("ExactTarget: OK, but duplicate email for $email_address");
                 $this->success();
             }
-            
+
             if ( $results->Results->StatusCode == 'Error' )
                 $this->error( $results->Results->StatusMessage );
 
@@ -95,17 +95,17 @@ class Exacttarget extends BaseConnector {
         } catch (SoapFault $e) {
             $this->error( $e->faultstring );
         }
-  
+
     }
-    
+
     /*
-     * Creates an instance of the ExactTarget client from the 
+     * Creates an instance of the ExactTarget client from the
      * official ExactTarget PHP library
      */
     public function get_client() {
-        
+
         $wsdl = get_option( $this->slugify_name('wsdl_url'), null);
-        
+
         if ( empty( $wsdl) )
             $this->error('Please specify an API path.');
 
@@ -114,9 +114,9 @@ class Exacttarget extends BaseConnector {
         $client->password = $this->_escape_characters($this->settings->password);
         return $client;
     }
-    
+
     /*
-     * Creates a new attribute to send along with 
+     * Creates a new attribute to send along with
      * the email address
      */
     public function get_attribute($name, $value) {
@@ -125,30 +125,30 @@ class Exacttarget extends BaseConnector {
         $attribute1->Value = $value;
         return $attribute;
     }
-    
+
     /*
      * In adition to the default form fields in the base class,
      * add another one to specify the WSDL url
      */
     public function get_form_fields() {
         $default_fields = parent::get_form_fields();
-        
-        $default_fields[] = new TextField( $this->slugify_name('wsdl_url'), 
-            'WSDL Url', array( 'value' => get_option( 
+
+        $default_fields[] = new TextField( $this->slugify_name('wsdl_url'),
+            'WSDL Url', array( 'value' => get_option(
                 $this->slugify_name('wsdl_url') )) );
-                
-        $default_fields[] = new TextField( $this->slugify_name('list_id'), 
-            'List ID', array( 'value' => get_option( 
+
+        $default_fields[] = new TextField( $this->slugify_name('list_id'),
+            'List ID', array( 'value' => get_option(
                 $this->slugify_name('list_id') )) );
-            
-        $default_fields[] = new TextField( $this->slugify_name('extra_param_name'), 
-            'Extra Param Name', array( 'value' => get_option( 
+
+        $default_fields[] = new TextField( $this->slugify_name('extra_param_name'),
+            'Extra Param Name', array( 'value' => get_option(
                 $this->slugify_name('extra_param_name') )) );
-            
-        $default_fields[] = new TextField( $this->slugify_name('extra_param_value'), 
-            'Extra Param Value', array( 'value' => get_option( 
+
+        $default_fields[] = new TextField( $this->slugify_name('extra_param_value'),
+            'Extra Param Value', array( 'value' => get_option(
                 $this->slugify_name('extra_param_value') )) );
-                
+
         return $default_fields;
     }
 
@@ -162,13 +162,13 @@ class Exacttarget extends BaseConnector {
         } catch (Exception $e) {
             $list_id = 111111;
         }
-        $list_obj = new ExactTarget_SubscriberList(); 
+        $list_obj = new ExactTarget_SubscriberList();
         $list_obj->ID = $list_id;
         $list_obj->Status = ExactTarget_SubscriberStatus::Active;
         $list_obj->Action = "create";
         return $list_obj;
     }
-    
+
     /*
      * Converts special xml-incompitable characters
      * so SOAP won't choke on it
