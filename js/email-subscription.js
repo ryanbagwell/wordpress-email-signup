@@ -1,6 +1,6 @@
 var EmailSignup = function(el) {
 	this.$el = $(el);
-	
+
 	this.$el.validate({
 		messages: this.messages,
 		errorPlacement: $.proxy(this.errorPlacement, this),
@@ -40,7 +40,7 @@ EmailSignup.prototype.errorHandler = function(error, el) {
 EmailSignup.prototype.submitHandler = function(form) {
 
 	this.beforeSubmit();
-	
+
 	$.ajax({
 		type: "POST",
 		url: this.ajaxURL(),
@@ -49,7 +49,7 @@ EmailSignup.prototype.submitHandler = function(form) {
 		error: $.proxy(this.ajaxError, this),
 		dataType: 'json'
 	});
-	
+
 	return false;
 
 };
@@ -70,7 +70,7 @@ EmailSignup.prototype.ajaxSuccess = function(response) {
 		this.signupError();
 		return;
 	}
-	
+
 	this.signupSuccess();
 
 };
