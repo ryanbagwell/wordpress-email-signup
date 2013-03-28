@@ -5,12 +5,12 @@
 			<label for="first-name">First Name</label>
 			<input type="text" name="first_name" id="first-name" value="" class="required" />
 		</li>
-		
+
         <li>
             <label for="last-name">Last Name</label>
             <input type="text" name="last_name" id="last-name" value="" class="required" />
         </li>
-		
+
 		<li>
 			<label for="email">Enter your email address</label>
 			<input type="text" name="email" id="email" value="" class="required email" />
