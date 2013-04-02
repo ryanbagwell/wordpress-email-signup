@@ -240,9 +240,12 @@ class EmailSignup extends WP_Widget
     {
         $this->load_services();
 
+        if ( $this->service !== false)
+            return $this->service;
+
         $selected_service = get_option('selected_submit_handler', false);
 
-        if ( $this->service === false )
+        if ( $selected_service !== false )
             $this->service = new $selected_service();
 
         return $this->service;
