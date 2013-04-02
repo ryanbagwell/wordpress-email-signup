@@ -40,7 +40,7 @@ require_once 'email-subscription.widget.php';
 class EmailSignup extends WP_Widget
 {
 
-    public $service = false;
+    public $services = array();
 
     /**
      * Our constructor
@@ -205,6 +205,12 @@ class EmailSignup extends WP_Widget
 
         include_once 'lib/php-form-helpers/form.class.php';
 
+        foreach( $this->services as $name => $service ) {
+
+            if ($service === false)
+                $this->services[$name] = $service = new $name();
+        }
+
         include_once 'templates/admin/admin.tpl.php';
 
     }
@@ -221,11 +227,16 @@ class EmailSignup extends WP_Widget
 
         foreach(scandir($services_dir) as $file) {
 
+            $class_name = ucfirst(str_replace('.php', '', $file));
+
+            if ($class_name == 'Base') continue;
+
             try {
-
-                @include_once $services_dir . $file;
-
+                $result = @include_once($services_dir . $file);
+                if ( $result == false ) continue;
+                $this->services[$class_name] = false;
             } catch(Exception $e) {}
+
 
         }
 
@@ -240,15 +251,18 @@ class EmailSignup extends WP_Widget
     {
         $this->load_services();
 
-        if ( $this->service !== false)
-            return $this->service;
+        try {
 
-        $selected_service = get_option('selected_submit_handler', false);
+            $selected_service = get_option('selected_submit_handler', false);
 
-        if ( $selected_service !== false )
-            $this->service = new $selected_service();
+            if ( $this->services[$selected_service] !== false )
+                return $this->services[$selected_service];
 
-        return $this->service;
+            $this->services[$selected_service] = new $selected_service();
+
+            return $this->services[$selected_service];
+
+        } catch (Exception $e) {}
 
     }
 
