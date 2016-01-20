@@ -1,11 +1,11 @@
 <?php
 /**
- * Plugin Name: Email Subscription
+ * Plugin Name: Multi-service Email Subscription
  *
  * Description: A simple email subscription widget that connects
  * various third-party providers
  *
- * Plugin URI: http://www.hzdg.com
+ * Plugin URI: https://github.com/ryanbagwell/wordpress-email-signup
  *
  *
  * Version: 1.0
