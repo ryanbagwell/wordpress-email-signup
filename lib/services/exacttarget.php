@@ -82,7 +82,7 @@ class Exacttarget extends BaseConnector {
              * This is the code for a duplicate email address
              * Just call the success handler
              */
-            if ( $results->Results->ErrorCode == 12014 ) {
+            if ( $results->Results->ErrorCode == 13006 ) {
                 error_log("ExactTarget: OK, but duplicate email for $email_address");
                 $this->success();
             }
